@@ -629,7 +629,12 @@ fn can_group_arrow_function_expression_argument(
         Expression::ChainExpression(chain) => {
             matches!(chain.expression, ChainElement::CallExpression(_)) && !is_arrow_recursion
         }
-        Expression::CallExpression(_) | Expression::ConditionalExpression(_) => !is_arrow_recursion,
+        Expression::CallExpression(_) | Expression::ConditionalExpression(_) => {
+            !is_arrow_recursion
+                && !f
+                    .comments()
+                    .has_type_cast_comment_in_range(arrow_function.span.start, expr.span().start)
+        }
         _ => false,
     })
 }

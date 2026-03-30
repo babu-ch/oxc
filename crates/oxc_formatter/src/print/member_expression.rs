@@ -100,6 +100,7 @@ fn layout<'a>(
             let no_break = match object {
                 Expression::CallExpression(call_expression) => {
                     !call_expression.arguments.is_empty()
+                        && !f.comments().is_type_cast_node(call_expression.as_ref())
                 }
                 Expression::TSNonNullExpression(non_null_assertion) => {
                     match &non_null_assertion.expression {

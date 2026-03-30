@@ -1,0 +1,28 @@
+---
+source: crates/oxc_formatter/tests/fixtures/mod.rs
+---
+==================== Input ====================
+if (attribute.expression.type === 'SequenceExpression') {
+	const [get, set] = /** @type {SequenceExpression} */ (context.visit(attribute.expression))
+		.expressions;
+}
+
+==================== Output ====================
+------------------
+{ printWidth: 80 }
+------------------
+if (attribute.expression.type === "SequenceExpression") {
+  const [get, set] = /** @type {SequenceExpression} */ (
+    context.visit(attribute.expression)
+  ).expressions;
+}
+
+-------------------
+{ printWidth: 100 }
+-------------------
+if (attribute.expression.type === "SequenceExpression") {
+  const [get, set] = /** @type {SequenceExpression} */ (context.visit(attribute.expression))
+    .expressions;
+}
+
+===================== End =====================

@@ -611,11 +611,39 @@ impl Linter {
             program.source_text = source_text;
         }
 
+        // For partial sources (Vue/Astro/Svelte script blocks), trim the leading newline
+        // from the source text passed to JS plugins. This prevents false "beginning of file"
+        // detection by rules like `no-multiple-empty-lines` with `maxBOF`.
+        // The newline right after `<script>` is an HTML tag boundary, not a JS blank line.
+        // Uses the same `new_with_offset` mechanism as BOM handling to keep AST spans correct.
+        // See: https://github.com/oxc-project/oxc/issues/20896
+        #[expect(clippy::bool_to_int_with_if)]
+        let trim_leading: u32 =
+            if !has_bom && ctx_host.current_sub_host().source_text_offset() > 0 {
+                if source_text.starts_with("\r\n") {
+                    2
+                } else if source_text.as_bytes().first() == Some(&b'\n') {
+                    1
+                } else {
+                    0
+                }
+            } else {
+                0
+            };
+
+        if trim_leading > 0 {
+            source_text = &source_text[trim_leading as usize..];
+            program.source_text = source_text;
+        }
+
         // Create span converter.
         // If source starts with BOM, create converter which ignores the BOM.
+        // If leading newline was trimmed, create converter which accounts for the trim offset.
         let span_converter = if has_bom {
             #[expect(clippy::cast_possible_truncation)]
             Utf8ToUtf16::new_with_offset(source_text, BOM_LEN as u32)
+        } else if trim_leading > 0 {
+            Utf8ToUtf16::new_with_offset(source_text, trim_leading)
         } else {
             Utf8ToUtf16::new(source_text)
         };

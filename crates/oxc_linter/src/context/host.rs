@@ -46,6 +46,10 @@ pub struct ContextSubHost<'a> {
 }
 
 impl<'a> ContextSubHost<'a> {
+    pub(crate) fn source_text_offset(&self) -> u32 {
+        self.source_text_offset
+    }
+
     pub fn new(
         semantic: Semantic<'a>,
         module_record: Arc<ModuleRecord>,

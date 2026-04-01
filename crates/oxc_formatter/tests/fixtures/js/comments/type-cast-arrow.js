@@ -16,3 +16,6 @@ const result = items_with_longer_name.map((child) => bar_without_typecast(child)
 
 // @satisfies type cast
 const z = items_with_longer_name.map((child) => /** @satisfies {SomeTypeThatIsLonger} */ (visit(child)));
+
+// Optional chaining with type cast
+const w = items_with_longer_name.map((child) => /** @type {SomeTypeThatIsLonger} */ (child?.visit()));

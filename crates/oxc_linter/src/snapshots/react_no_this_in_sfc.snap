@@ -1,7 +1,6 @@
 ---
 source: crates/oxc_linter/src/tester.rs
 ---
-
   ⚠ eslint-plugin-react(no-this-in-sfc): Stateless functional components should not use `this`
    ╭─[no_this_in_sfc.tsx:3:39]
  2 │                     function Foo(props) {
@@ -76,6 +75,15 @@ source: crates/oxc_linter/src/tester.rs
    ╭─[no_this_in_sfc.tsx:1:24]
  1 │ const Foo = (props) => this.props.foo ? <span>{props.bar}</span> : null;
    ·                        ────
+   ╰────
+  help: Use props and context directly as function parameters instead of accessing them through `this`
+
+  ⚠ eslint-plugin-react(no-this-in-sfc): Stateless functional components should not use `this`
+   ╭─[no_this_in_sfc.tsx:3:36]
+ 2 │                     function Foo(props) {
+ 3 │                       return <div>{this["props"].foo}</div>;
+   ·                                    ────
+ 4 │                     }
    ╰────
   help: Use props and context directly as function parameters instead of accessing them through `this`
 

@@ -175,16 +175,10 @@ fn expression_uses_index(ctx: &LintContext, symbol_id: SymbolId, expr: &Expressi
     }
 }
 
-fn jsx_expression_uses_index(
-    ctx: &LintContext,
-    symbol_id: SymbolId,
-    expr: &JSXExpression,
-) -> bool {
+fn jsx_expression_uses_index(ctx: &LintContext, symbol_id: SymbolId, expr: &JSXExpression) -> bool {
     match expr {
         JSXExpression::EmptyExpression(_) => false,
-        _ => expr
-            .as_expression()
-            .is_some_and(|e| expression_uses_index(ctx, symbol_id, e)),
+        _ => expr.as_expression().is_some_and(|e| expression_uses_index(ctx, symbol_id, e)),
     }
 }
 

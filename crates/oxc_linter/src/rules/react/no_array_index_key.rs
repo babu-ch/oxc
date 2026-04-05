@@ -120,10 +120,12 @@ fn check_react_clone_element<'a>(
 }
 
 fn is_index_reference(ctx: &LintContext, symbol_id: SymbolId, expr: &Expression) -> bool {
-    let Expression::Identifier(ident) = expr else {
-        return false;
+    if let Expression::Identifier(ident) = expr.get_inner_expression()
+        && ctx.scoping().get_reference(ident.reference_id()).symbol_id() == Some(symbol_id)
+    {
+        return true;
     };
-    ctx.scoping().get_reference(ident.reference_id()).symbol_id() == Some(symbol_id)
+    false
 }
 
 fn binary_expression_uses_index(

@@ -177,7 +177,6 @@ fn dangerous_fix_all_text_edit(actions: impl Iterator<Item = LinterCodeAction>) 
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use std::str::FromStr;
 
@@ -188,7 +187,7 @@ mod tests {
     use super::*;
     use crate::lsp::error_with_position::{FixedContent, FixedContentKind, LinterCodeAction};
 
-    fn make_action(
+    fn make_ranged_action(
         start_line: u32,
         start_char: u32,
         end_line: u32,
@@ -211,7 +210,7 @@ mod tests {
     #[test]
     fn test_fix_all_text_edit_sorts_by_position() {
         // Edits provided in reverse order should be sorted by start position.
-        let actions = vec![make_action(2, 0, 2, 5), make_action(0, 0, 0, 5)];
+        let actions = vec![make_ranged_action(2, 0, 2, 5), make_ranged_action(0, 0, 0, 5)];
         let result = fix_all_text_edit(actions.into_iter());
         assert_eq!(result.len(), 2);
         assert_eq!(result[0].range.start.line, 0);
@@ -221,7 +220,7 @@ mod tests {
     #[test]
     fn test_fix_all_text_edit_drops_overlapping() {
         // The second edit overlaps the first; only the first should be kept.
-        let actions = vec![make_action(0, 0, 0, 10), make_action(0, 5, 0, 15)];
+        let actions = vec![make_ranged_action(0, 0, 0, 10), make_ranged_action(0, 5, 0, 15)];
         let result = fix_all_text_edit(actions.into_iter());
         assert_eq!(result.len(), 1);
         assert_eq!(result[0].range.end.character, 10);
@@ -233,12 +232,12 @@ mod tests {
         // equals the start of the next) are conservatively treated as overlapping and the second
         // is dropped. This is a safe trade-off: the fix can be applied on the next invocation,
         // and it avoids any risk of producing unexpected output for boundary-sharing edits.
-        let actions = vec![make_action(0, 0, 0, 5), make_action(0, 5, 0, 10)];
+        let actions = vec![make_ranged_action(0, 0, 0, 5), make_ranged_action(0, 5, 0, 10)];
         let result = fix_all_text_edit(actions.into_iter());
         assert_eq!(result.len(), 1);
     }
 
-    fn make_action(kind: FixKind) -> LinterCodeAction {
+    fn make_fix_kind_action(kind: FixKind) -> LinterCodeAction {
         LinterCodeAction {
             range: Range::default(),
             fixed_content: vec![FixedContent {
@@ -253,20 +252,21 @@ mod tests {
 
     #[test]
     fn test_fix_all_text_edit_skips_dangerous_fix() {
-        let text_edits = fix_all_text_edit(std::iter::once(make_action(FixKind::DangerousFix)));
+        let text_edits =
+            fix_all_text_edit(std::iter::once(make_fix_kind_action(FixKind::DangerousFix)));
         assert!(text_edits.is_empty(), "dangerous fix should always be skipped in safe fix-all");
     }
 
     #[test]
     fn test_fix_all_text_edit_includes_safe_fix() {
-        let text_edits = fix_all_text_edit(std::iter::once(make_action(FixKind::SafeFix)));
+        let text_edits = fix_all_text_edit(std::iter::once(make_fix_kind_action(FixKind::SafeFix)));
         assert!(!text_edits.is_empty(), "safe fix should be included");
     }
 
     #[test]
     fn test_apply_all_fix_code_action_uses_safe_kind() {
         let action = apply_all_fix_code_action(
-            std::iter::once(make_action(FixKind::SafeFix)),
+            std::iter::once(make_fix_kind_action(FixKind::SafeFix)),
             Uri::from_str("file:///test.js").unwrap(),
         )
         .unwrap();
@@ -276,7 +276,7 @@ mod tests {
     #[test]
     fn test_apply_dangerous_fix_code_action_uses_dangerous_kind() {
         let action = apply_dangerous_fix_code_action(
-            std::iter::once(make_action(FixKind::DangerousFix)),
+            std::iter::once(make_fix_kind_action(FixKind::DangerousFix)),
             Uri::from_str("file:///test.js").unwrap(),
         )
         .unwrap();

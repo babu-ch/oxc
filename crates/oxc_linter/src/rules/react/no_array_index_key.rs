@@ -148,7 +148,7 @@ fn expression_uses_index(ctx: &LintContext, symbol_id: SymbolId, expr: &Expressi
     match expr {
         // key={`abc${index}`}
         Expression::TemplateLiteral(tmpl) => {
-            tmpl.expressions.iter().any(|e| is_index_reference(ctx, symbol_id, e))
+            tmpl.expressions.iter().any(|e| expression_uses_index(ctx, symbol_id, e))
         }
         // key={1 + index}
         Expression::BinaryExpression(bin) => binary_expression_uses_index(ctx, symbol_id, bin),
@@ -396,11 +396,19 @@ fn test() {
           ));
         ",
         r"things.map((thing, index) => (
+            <Hello key={`abc${String(index)}`} />
+          ));
+        ",
+        r"things.map((thing, index) => (
             React.cloneElement(thing, { key: index.toString() })
           ));
         ",
         r"things.map((thing, index) => (
             React.cloneElement(thing, { key: String(index) })
+          ));
+        ",
+        r"things.map((thing, index) => (
+            React.cloneElement(thing, { key: `abc${index.toString()}` })
           ));
         ",
     ];

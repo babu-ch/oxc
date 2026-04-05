@@ -160,14 +160,33 @@ pub fn fix_all_text_edit(actions: impl Iterator<Item = LinterCodeAction>) -> Vec
     result
 }
 
+fn dangerous_fix_all_text_edit(actions: impl Iterator<Item = LinterCodeAction>) -> Vec<TextEdit> {
+    let mut text_edits: Vec<TextEdit> = vec![];
+
+    for action in actions {
+        let Some(fixed_content) = action.fixed_content.into_iter().find(|fixed| {
+            matches!(fixed.lsp_kind, FixedContentKind::LintRule | FixedContentKind::UnusedDirective)
+        }) else {
+            continue;
+        };
+
+        text_edits.push(TextEdit { range: fixed_content.range, new_text: fixed_content.code });
+    }
+
+    text_edits
+}
+
+#[cfg(test)]
 #[cfg(test)]
 mod tests {
-    use oxc_linter::FixKind;
+    use std::str::FromStr;
+
     use tower_lsp_server::ls_types::{Position, Range};
 
-    use crate::lsp::error_with_position::{FixedContent, FixedContentKind, LinterCodeAction};
+    use oxc_linter::FixKind;
 
-    use super::fix_all_text_edit;
+    use super::*;
+    use crate::lsp::error_with_position::{FixedContent, FixedContentKind, LinterCodeAction};
 
     fn make_action(
         start_line: u32,
@@ -218,32 +237,6 @@ mod tests {
         let result = fix_all_text_edit(actions.into_iter());
         assert_eq!(result.len(), 1);
     }
-}
-
-fn dangerous_fix_all_text_edit(actions: impl Iterator<Item = LinterCodeAction>) -> Vec<TextEdit> {
-    let mut text_edits: Vec<TextEdit> = vec![];
-
-    for action in actions {
-        let Some(fixed_content) = action.fixed_content.into_iter().find(|fixed| {
-            matches!(fixed.lsp_kind, FixedContentKind::LintRule | FixedContentKind::UnusedDirective)
-        }) else {
-            continue;
-        };
-
-        text_edits.push(TextEdit { range: fixed_content.range, new_text: fixed_content.code });
-    }
-
-    text_edits
-}
-
-#[cfg(test)]
-mod tests {
-    use std::str::FromStr;
-
-    use tower_lsp_server::ls_types::{Position, Range};
-
-    use super::*;
-    use crate::lsp::error_with_position::FixedContentKind;
 
     fn make_action(kind: FixKind) -> LinterCodeAction {
         LinterCodeAction {

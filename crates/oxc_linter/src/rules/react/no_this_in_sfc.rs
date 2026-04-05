@@ -71,12 +71,7 @@ impl Rule for NoThisInSfc {
     fn run<'a>(&self, node: &AstNode<'a>, ctx: &LintContext<'a>) {
         let AstKind::ThisExpression(this_expr) = node.kind() else { return };
 
-        if !matches!(
-            ctx.nodes().parent_kind(node.id()),
-            AstKind::StaticMemberExpression(_)
-                | AstKind::ComputedMemberExpression(_)
-                | AstKind::PrivateFieldExpression(_)
-        ) {
+        if !ctx.nodes().parent_kind(node.id()).is_member_expression_kind() {
             return;
         }
 

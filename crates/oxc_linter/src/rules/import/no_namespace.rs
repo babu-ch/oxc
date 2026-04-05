@@ -100,7 +100,6 @@ impl Rule for NoNamespace {
 
                 if self.ignore.is_empty()
                     || self.ignore.iter().all(|pattern| {
-                        let source = source.trim_start_matches("./");
                         let target = if pattern.contains('/') {
                             source
                         } else {
@@ -144,6 +143,10 @@ fn test() {
             r"import * as schema from '../db/schema'",
             Some(serde_json::json!([{ "ignore": ["*schema"] }])),
         ),
+        (
+            r"import * as schema from './src/db/schema'",
+            Some(serde_json::json!([{ "ignore": ["./src/db/*"] }])),
+        ),
     ];
 
     let fail = vec![
@@ -156,6 +159,10 @@ fn test() {
             import * as DrizzleKit from 'drizzle-kit/api'
             ",
             Some(serde_json::json!([{ "ignore": ["zod"] }])),
+        ),
+        (
+            r"import * as schema from './src/db/schema'",
+            Some(serde_json::json!([{ "ignore": ["src/db/*"] }])),
         ),
     ];
 

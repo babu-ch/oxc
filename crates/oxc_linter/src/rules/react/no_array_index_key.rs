@@ -124,7 +124,7 @@ fn is_index_reference(ctx: &LintContext, symbol_id: SymbolId, expr: &Expression)
         && ctx.scoping().get_reference(ident.reference_id()).symbol_id() == Some(symbol_id)
     {
         return true;
-    };
+    }
     false
 }
 

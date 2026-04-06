@@ -4,7 +4,7 @@
 # stdout
 ```
   x empty-lines-plugin(no-multiple-empty-lines): More than 0 blank line not allowed.
-   ,-[<fixture>/files/test.vue:8:1]
+   ,-[files/test.vue:8:1]
  7 | 
  8 | const test = ref();
    : ^
@@ -12,7 +12,7 @@
    `----
 
   x empty-lines-plugin(no-multiple-empty-lines): More than 0 blank line not allowed.
-    ,-[<fixture>/files/test.vue:10:1]
+    ,-[files/test.vue:10:1]
   9 | 
  10 | // ok
     : ^

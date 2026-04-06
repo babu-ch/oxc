@@ -7,6 +7,7 @@ import { ref } from "vue";
 
 const test = ref();
 
+
 // ok
 test.value = "a";
 </script>

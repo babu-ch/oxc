@@ -8,7 +8,7 @@
  10 | 
  11 | // ok
     : ^
- 12 | test.value = 'a';
+ 12 | test.value = "a";
     `----
 
 Found 0 warnings and 1 error.

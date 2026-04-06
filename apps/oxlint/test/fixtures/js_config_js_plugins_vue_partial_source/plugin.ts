@@ -10,7 +10,7 @@ const plugin: Plugin = {
         schema: false,
       },
       create(context) {
-        const options = context.options[0] ?? {};
+        const options = (context.options[0] ?? {}) as Record<string, number>;
         const max = options.max ?? 2;
         const maxBOF = options.maxBOF ?? max;
 

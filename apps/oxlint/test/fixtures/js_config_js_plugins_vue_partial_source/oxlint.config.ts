@@ -6,9 +6,6 @@ export default defineConfig({
   },
   jsPlugins: ["./plugin.ts"],
   rules: {
-    "empty-lines-plugin/no-multiple-empty-lines": [
-      "error",
-      { max: 1, maxBOF: 0 },
-    ],
+    "empty-lines-plugin/no-multiple-empty-lines": ["error", { max: 1, maxBOF: 0 }],
   },
 });

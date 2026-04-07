@@ -145,7 +145,7 @@ fn has_argument_leading_comments(argument: &AstNode<Expression>, f: &Formatter<'
 
         if leading_comments.iter().any(|comment| {
             (comment.is_multiline_block() || comment.followed_by_newline())
-                && !type_cast_comment_end.is_some_and(|end| comment.span.start >= end)
+                && type_cast_comment_end.is_none_or(|end| comment.span.start < end)
         }) {
             return true;
         }

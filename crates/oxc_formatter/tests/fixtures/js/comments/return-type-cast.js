@@ -22,3 +22,8 @@ function satisfies_type_cast() {
 		key: "value"
 	});
 }
+
+function long_type_cast_in_return() {
+	return (/** @type {ThisIsAVeryLongTypeThatShouldTriggerLineWrapping} */
+		(fooBarBaz));
+}

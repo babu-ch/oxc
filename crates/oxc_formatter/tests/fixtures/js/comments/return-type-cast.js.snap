@@ -27,6 +27,11 @@ function satisfies_type_cast() {
 	});
 }
 
+function long_type_cast_in_return() {
+	return (/** @type {ThisIsAVeryLongTypeThatShouldTriggerLineWrapping} */
+		(fooBarBaz));
+}
+
 ==================== Output ====================
 ------------------
 { printWidth: 80 }
@@ -56,6 +61,13 @@ function satisfies_type_cast() {
   });
 }
 
+function long_type_cast_in_return() {
+  return (
+    /** @type {ThisIsAVeryLongTypeThatShouldTriggerLineWrapping} */
+    (fooBarBaz)
+  );
+}
+
 -------------------
 { printWidth: 100 }
 -------------------
@@ -82,6 +94,13 @@ function satisfies_type_cast() {
   return /** @satisfies {Record<string, unknown>} */ ({
     key: "value",
   });
+}
+
+function long_type_cast_in_return() {
+  return (
+    /** @type {ThisIsAVeryLongTypeThatShouldTriggerLineWrapping} */
+    (fooBarBaz)
+  );
 }
 
 ===================== End =====================

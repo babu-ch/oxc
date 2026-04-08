@@ -27,3 +27,13 @@ function long_type_cast_in_return() {
 	return (/** @type {ThisIsAVeryLongTypeThatShouldTriggerLineWrapping} */
 		(fooBarBaz));
 }
+
+function type_cast_member_expression() {
+	return (
+		/** @type {X} */ (
+			obj
+				// comment
+				.prop
+		)
+	);
+}

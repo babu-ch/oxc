@@ -151,9 +151,10 @@ fn has_argument_leading_comments(argument: &AstNode<Expression>, f: &Formatter<'
         }
 
         let is_own_line_comment_or_multi_line_comment = |leading_comments: &[Comment]| {
-            leading_comments
-                .iter()
-                .any(|comment| comment.is_multiline_block() || comment.preceded_by_newline())
+            leading_comments.iter().any(|comment| {
+                (comment.is_multiline_block() || comment.preceded_by_newline())
+                    && type_cast_comment_end.is_none_or(|end| comment.span.start < end)
+            })
         };
 
         // Yield expressions only need to check the leading comments on the left side.

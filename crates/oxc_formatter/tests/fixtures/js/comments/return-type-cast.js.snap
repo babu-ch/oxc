@@ -32,6 +32,16 @@ function long_type_cast_in_return() {
 		(fooBarBaz));
 }
 
+function type_cast_member_expression() {
+	return (
+		/** @type {X} */ (
+			obj
+				// comment
+				.prop
+		)
+	);
+}
+
 ==================== Output ====================
 ------------------
 { printWidth: 80 }
@@ -68,6 +78,14 @@ function long_type_cast_in_return() {
   );
 }
 
+function type_cast_member_expression() {
+  return /** @type {X} */ (
+    obj
+      // comment
+      .prop
+  );
+}
+
 -------------------
 { printWidth: 100 }
 -------------------
@@ -100,6 +118,14 @@ function long_type_cast_in_return() {
   return (
     /** @type {ThisIsAVeryLongTypeThatShouldTriggerLineWrapping} */
     (fooBarBaz)
+  );
+}
+
+function type_cast_member_expression() {
+  return /** @type {X} */ (
+    obj
+      // comment
+      .prop
   );
 }
 

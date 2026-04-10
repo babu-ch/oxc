@@ -9,5 +9,12 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "exclude": ["node_modules", "fixtures", "test/fixtures/*/files", "test/fixtures/*/vite.config.ts", "test/fixtures/*/files/vite.config.ts", "conformance/submodules"]
+  "exclude": [
+    "node_modules",
+    "fixtures",
+    "test/fixtures/*/files",
+    "test/fixtures/*/vite.config.ts",
+    "test/fixtures/*/files/vite.config.ts",
+    "conformance/submodules"
+  ]
 }

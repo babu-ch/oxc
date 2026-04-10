@@ -307,18 +307,22 @@ impl ConfigResolver {
                 // For `vite.config.ts`
                 #[cfg(feature = "napi")]
                 if is_vite_plus_config(&path) {
-                    // Load successful and `.fmt` field found -> Use it as config
-                    // Load failed (e.g. syntax error, missing dependencies) -> Propagate error
-                    if let Some(raw_config) = load_js_config(
+                    match load_js_config(
                         js_config_loader
                             .expect("JS config loader must be set when `napi` feature is enabled"),
                         &path,
-                    )? {
-                        let editorconfig = load_editorconfig(cwd, editorconfig_path)?;
-                        let config_dir = path.parent().map(Path::to_path_buf);
-                        return Ok(Self::new(raw_config, config_dir, editorconfig));
+                    ) {
+                        // Load successful and `.fmt` field found -> Use it as config
+                        Ok(Some(raw_config)) => {
+                            let editorconfig = load_editorconfig(cwd, editorconfig_path)?;
+                            let config_dir = path.parent().map(Path::to_path_buf);
+                            return Ok(Self::new(raw_config, config_dir, editorconfig));
+                        }
+                        // Load successful but no `.fmt` field found -> Skip and continue searching
+                        Ok(None) => {}
+                        // Load failed (e.g. missing dependencies, unsupported TS) -> Skip and continue searching
+                        Err(_) => {}
                     }
-                    // Load successful but no `.fmt` field found -> Skip this file and continue searching.
                     continue;
                 }
 

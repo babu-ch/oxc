@@ -2,7 +2,13 @@ commit: ff0d1611
 
 minifier_test262 Summary:
 AST Parsed     : 44642/44642 (100.00%)
-Positive Passed: 44635/44642 (99.98%)
+Positive Passed: 44632/44642 (99.98%)
+Compress: tasks/coverage/test262/test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-ii-5.js
+
+Compress: tasks/coverage/test262/test/built-ins/Array/prototype/reduce/15.4.4.21-9-c-ii-5.js
+
+Compress: tasks/coverage/test262/test/built-ins/Array/prototype/reduceRight/15.4.4.22-9-c-ii-5.js
+
 Compress: tasks/coverage/test262/test/intl402/Temporal/PlainDate/prototype/toLocaleString/lone-options-accepted.js
 
 Compress: tasks/coverage/test262/test/intl402/Temporal/PlainMonthDay/prototype/toLocaleString/lone-options-accepted.js

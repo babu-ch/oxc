@@ -542,10 +542,10 @@ impl<'a> ConfigLoader<'a> {
         // If .lint field is missing, `load_root_js_config` returns `Ok(None)` to skip.
         // If loading fails (e.g. missing dependencies, unsupported TS), skip and continue.
         let vite_config_path = dir.join(VITE_CONFIG_NAME);
-        if vite_config_path.is_file() {
-            if let Ok(config) = self.load_root_js_config(&vite_config_path) {
-                return Ok(config);
-            }
+        if vite_config_path.is_file()
+            && let Ok(config) = self.load_root_js_config(&vite_config_path)
+        {
+            return Ok(config);
         }
 
         Ok(None)

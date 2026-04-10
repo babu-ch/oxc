@@ -543,9 +543,8 @@ impl<'a> ConfigLoader<'a> {
         // If loading fails (e.g. missing dependencies, unsupported TS), skip and continue.
         let vite_config_path = dir.join(VITE_CONFIG_NAME);
         if vite_config_path.is_file() {
-            match self.load_root_js_config(&vite_config_path) {
-                Ok(config) => return Ok(config),
-                Err(_) => {}
+            if let Ok(config) = self.load_root_js_config(&vite_config_path) {
+                return Ok(config);
             }
         }
 

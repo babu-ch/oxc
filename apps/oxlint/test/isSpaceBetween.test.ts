@@ -162,7 +162,7 @@ describe("isSpaceBetweenTokens()", () => {
     assert.strictEqual(attr.type, "JSXAttribute");
     assert(attr.value !== null);
 
-    const tokens = ast.tokens;
+    const { tokens } = ast;
     const equalToken = tokens.find((t: { value: string }) => t.value === "=");
     assert(equalToken != null);
 
@@ -183,7 +183,7 @@ describe("isSpaceBetweenTokens()", () => {
     assert.strictEqual(attr.type, "JSXAttribute");
     assert(attr.value !== null);
 
-    const tokens = ast.tokens;
+    const { tokens } = ast;
     const equalToken = tokens.find((t: { value: string }) => t.value === "=");
     assert(equalToken != null);
 

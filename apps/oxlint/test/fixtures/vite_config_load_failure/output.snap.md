@@ -4,7 +4,7 @@
 # stdout
 ```
   ! eslint(no-debugger): `debugger` statement is not allowed
-   ,-[<fixture>/files/test.js:1:1]
+   ,-[files/test.js:1:1]
  1 | debugger;
    : ^^^^^^^^^
    `----

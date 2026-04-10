@@ -318,10 +318,8 @@ impl ConfigResolver {
                             let config_dir = path.parent().map(Path::to_path_buf);
                             return Ok(Self::new(raw_config, config_dir, editorconfig));
                         }
-                        // Load successful but no `.fmt` field found -> Skip and continue searching
-                        Ok(None) => {}
-                        // Load failed (e.g. missing dependencies, unsupported TS) -> Skip and continue searching
-                        Err(_) => {}
+                        // No `.fmt` field found, or load failed -> Skip and continue searching
+                        Ok(None) | Err(_) => {}
                     }
                     continue;
                 }

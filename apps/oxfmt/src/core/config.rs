@@ -307,19 +307,14 @@ impl ConfigResolver {
                 // For `vite.config.ts`
                 #[cfg(feature = "napi")]
                 if is_vite_plus_config(&path) {
-                    match load_js_config(
+                    if let Ok(Some(raw_config)) = load_js_config(
                         js_config_loader
                             .expect("JS config loader must be set when `napi` feature is enabled"),
                         &path,
                     ) {
-                        // Load successful and `.fmt` field found -> Use it as config
-                        Ok(Some(raw_config)) => {
-                            let editorconfig = load_editorconfig(cwd, editorconfig_path)?;
-                            let config_dir = path.parent().map(Path::to_path_buf);
-                            return Ok(Self::new(raw_config, config_dir, editorconfig));
-                        }
-                        // No `.fmt` field found, or load failed -> Skip and continue searching
-                        Ok(None) | Err(_) => {}
+                        let editorconfig = load_editorconfig(cwd, editorconfig_path)?;
+                        let config_dir = path.parent().map(Path::to_path_buf);
+                        return Ok(Self::new(raw_config, config_dir, editorconfig));
                     }
                     continue;
                 }

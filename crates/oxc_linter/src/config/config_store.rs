@@ -155,12 +155,19 @@ impl Config {
             }
         }
 
+        // Include compatible jest rules when vitest is enabled, see `ConfigStoreBuilder::build`.
+        let effective_plugins = if plugins.contains(LintPlugins::VITEST) {
+            plugins | LintPlugins::JEST
+        } else {
+            plugins
+        };
+
         let mut rules = self
             .base_rules
             .iter()
             .filter(|(rule, _)| {
                 LintPlugins::try_from(rule.plugin_name())
-                    .is_ok_and(|plugin| plugins.contains(plugin))
+                    .is_ok_and(|plugin| effective_plugins.contains(plugin))
             })
             .cloned()
             .collect::<FxHashMap<_, _>>();
@@ -169,7 +176,7 @@ impl Config {
             .iter()
             .filter(|rule| {
                 LintPlugins::try_from(rule.plugin_name())
-                    .is_ok_and(|plugin| plugins.contains(plugin))
+                    .is_ok_and(|plugin| effective_plugins.contains(plugin))
             })
             .cloned()
             .collect::<Vec<_>>();
@@ -184,7 +191,11 @@ impl Config {
 
         // Track which plugins have already had their category rules applied.
         // Start with the root plugins since they already have categories applied in base_rules.
-        let mut configured_plugins = self.base.config.plugins;
+        let mut configured_plugins = if self.base.config.plugins.contains(LintPlugins::VITEST) {
+            self.base.config.plugins | LintPlugins::JEST
+        } else {
+            self.base.config.plugins
+        };
 
         for override_config in overrides_to_apply {
             if let Some(override_plugins) = override_config.plugins
@@ -405,8 +416,8 @@ mod test {
         },
         rule::Rule,
         rules::{
-            EslintCurly, EslintNoUnusedVars, ReactJsxFilenameExtension, TypescriptNoExplicitAny,
-            TypescriptNoMisusedPromises,
+            EslintCurly, EslintNoUnusedVars, JestPreferStrictEqual, ReactJsxFilenameExtension,
+            TypescriptNoExplicitAny, TypescriptNoMisusedPromises,
         },
     };
 
@@ -1040,6 +1051,84 @@ mod test {
         assert!(
             jsx_filename_rule.is_none(),
             "jsx-filename-extension should remain disabled (not re-enabled by categories)"
+        );
+    }
+
+    #[test]
+    fn test_vitest_compatible_jest_rules_kept_with_empty_override() {
+        // Regression test for https://github.com/oxc-project/oxc/issues/21284
+        // An empty override must not drop vitest-compatible jest/* rules.
+
+        let base_config = LintConfig { plugins: LintPlugins::VITEST, ..Default::default() };
+
+        let base_rules = vec![(
+            RuleEnum::JestPreferStrictEqual(JestPreferStrictEqual::default()),
+            AllowWarnDeny::Warn,
+        )];
+
+        let overrides = ResolvedOxlintOverrides::new(vec![ResolvedOxlintOverride {
+            env: None,
+            files: GlobSet::new(vec!["**/*.spec.ts"]),
+            plugins: None,
+            globals: None,
+            rules: ResolvedOxlintOverrideRules { builtin_rules: vec![], external_rules: vec![] },
+        }]);
+
+        let store = ConfigStore::new(
+            Config::new(base_rules, vec![], OxlintCategories::default(), base_config, overrides),
+            FxHashMap::default(),
+            ExternalPluginStore::default(),
+        );
+
+        let resolved = store.resolve("foo.spec.ts".as_ref());
+
+        let has_jest_prefer_strict_equal = resolved
+            .rules
+            .iter()
+            .any(|(rule, _)| matches!(rule, RuleEnum::JestPreferStrictEqual(_)));
+
+        assert!(
+            has_jest_prefer_strict_equal,
+            "vitest-compatible jest/* rules must be preserved when an empty override matches"
+        );
+    }
+
+    #[test]
+    fn test_vitest_compatible_jest_rules_kept_when_override_adds_plugin() {
+        // Regression test for https://github.com/oxc-project/oxc/issues/21284
+        // Adding a plugin via override must not drop vitest-compatible jest/* rules.
+
+        let base_config = LintConfig { plugins: LintPlugins::VITEST, ..Default::default() };
+
+        let base_rules = vec![(
+            RuleEnum::JestPreferStrictEqual(JestPreferStrictEqual::default()),
+            AllowWarnDeny::Warn,
+        )];
+
+        let overrides = ResolvedOxlintOverrides::new(vec![ResolvedOxlintOverride {
+            env: None,
+            files: GlobSet::new(vec!["**/*.spec.ts"]),
+            plugins: Some(LintPlugins::TYPESCRIPT),
+            globals: None,
+            rules: ResolvedOxlintOverrideRules { builtin_rules: vec![], external_rules: vec![] },
+        }]);
+
+        let store = ConfigStore::new(
+            Config::new(base_rules, vec![], OxlintCategories::default(), base_config, overrides),
+            FxHashMap::default(),
+            ExternalPluginStore::default(),
+        );
+
+        let resolved = store.resolve("foo.spec.ts".as_ref());
+
+        let has_jest_prefer_strict_equal = resolved
+            .rules
+            .iter()
+            .any(|(rule, _)| matches!(rule, RuleEnum::JestPreferStrictEqual(_)));
+
+        assert!(
+            has_jest_prefer_strict_equal,
+            "vitest-compatible jest/* rules must be preserved when an override adds another plugin"
         );
     }
 

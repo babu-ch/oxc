@@ -55,24 +55,10 @@ clone react https://github.com/facebook/react.git "$REACT_SHA"
 # Install dependencies
 yarn
 
-# Install `eslint-plugin-react-hooks` dependency
-cd packages/eslint-plugin-react-hooks
-yarn add eslint-plugin-react-hooks
-cd ../..
-
-# @overlookmotel says: @camc314 added the next block to this script, but it doesn't seem to work on my machine.
-# Presumably it's because we're using different versions of `yarn`, but I can't track down the problem exactly.
-# So I'm commenting it out again for now.
-# @connorshea says: I also ran into the problem cam had, I'm using yarn v1 via homebrew.
-
-# Ensure `eslint-plugin-react-hooks` can be resolved from the React tests directory.
-# In recent React workspace setups this is already satisfied after `yarn`, and forcing
-# `yarn add` here can fail with workspace invariant errors.
-# if ! node -e "require.resolve('eslint-plugin-react-hooks/package.json')" >/dev/null 2>&1; then
-#   cd packages/eslint-plugin-react-hooks
-#   yarn add eslint-plugin-react-hooks
-#   cd ../..
-# fi
+# `babel-plugin-react-compiler` is a dependency of `eslint-plugin-react-hooks` tests.
+# `yarn add eslint-plugin-react-hooks` would install it, but fails with workspace invariant
+# errors on yarn v1. Install `babel-plugin-react-compiler` directly instead.
+yarn add babel-plugin-react-compiler --dev -W
 
 # Return to `submodules` directory
 cd ..

@@ -935,16 +935,29 @@ fn test() {
             ",
             None,
         ),
-        // (
-        //     "
-        // namespace foo.bar {
-        //   export interface User {
-        //     name: string;
-        //   }
-        // }
-        //     ",
-        //     None,
-        // ),
+        (
+            "
+        namespace foo.bar {
+          export interface User {
+            name: string;
+          }
+        }
+            ",
+            None,
+        ),
+        (
+            "
+        export namespace editor.multiplayer {
+          export type AwarenessPayload = {
+            cursor: { x: number; y: number } | null;
+          };
+        }
+        export namespace editor.internal.export_settings {
+          export type Format = 'png' | 'svg';
+        }
+            ",
+            None,
+        ),
         // exported self-referencing types
         (
             "

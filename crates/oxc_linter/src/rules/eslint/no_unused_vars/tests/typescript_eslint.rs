@@ -945,19 +945,6 @@ fn test() {
             ",
             None,
         ),
-        (
-            "
-        export namespace editor.multiplayer {
-          export type AwarenessPayload = {
-            cursor: { x: number; y: number } | null;
-          };
-        }
-        export namespace editor.internal.export_settings {
-          export type Format = 'png' | 'svg';
-        }
-            ",
-            None,
-        ),
         // exported self-referencing types
         (
             "

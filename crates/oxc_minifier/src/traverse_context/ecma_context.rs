@@ -24,6 +24,39 @@ pub fn is_exact_int64(num: f64) -> bool {
     num.fract() == 0.0
 }
 
+/// Whether the `this` at the current traverse position is lexically inside a
+/// class constructor. In a derived class constructor, accessing `this` before
+/// `super()` is called throws a `ReferenceError`, so such `this` references
+/// must be treated as potentially side-effectful.
+fn this_is_inside_class_constructor<'a>(ctx: &TraverseCtx<'a, MinifierState<'a>>) -> bool {
+    let mut ancestors = ctx.ancestors();
+    while let Some(ancestor) = ancestors.next() {
+        match ancestor {
+            // Static blocks and class field initializers have a `this` that is
+            // always initialized by the time it can be observed.
+            Ancestor::StaticBlockBody(_) | Ancestor::PropertyDefinitionValue(_) => return false,
+            // Crossed the nearest non-arrow function boundary; the `this` binding
+            // belongs to this function. When the function is a class constructor,
+            // referencing `this` may throw.
+            Ancestor::FunctionBody(_)
+            | Ancestor::FunctionParams(_)
+            | Ancestor::FunctionThisParam(_)
+            | Ancestor::FunctionReturnType(_)
+            | Ancestor::FunctionTypeParameters(_)
+            | Ancestor::FunctionId(_) => {
+                return matches!(
+                    ancestors.next(),
+                    Some(Ancestor::MethodDefinitionValue(method))
+                        if *method.kind() == MethodDefinitionKind::Constructor
+                );
+            }
+            // Arrow function frames do not bind their own `this`; keep walking.
+            _ => {}
+        }
+    }
+    false
+}
+
 impl<'a> GlobalContext<'a> for TraverseCtx<'a, MinifierState<'a>> {
     fn is_global_reference(&self, ident: &IdentifierReference<'_>) -> bool {
         ident.is_global_reference(self.scoping())
@@ -93,6 +126,10 @@ impl<'a> MayHaveSideEffectsContext<'a> for TraverseCtx<'a, MinifierState<'a>> {
     fn unknown_global_side_effects(&self) -> bool {
         self.state.options.treeshake.unknown_global_side_effects
     }
+
+    fn this_may_have_side_effects(&self) -> bool {
+        this_is_inside_class_constructor(self)
+    }
 }
 
 impl<'a> MayHaveSideEffectsContext<'a> for &TraverseCtx<'a, MinifierState<'a>> {
@@ -115,6 +152,10 @@ impl<'a> MayHaveSideEffectsContext<'a> for &TraverseCtx<'a, MinifierState<'a>> {
     fn unknown_global_side_effects(&self) -> bool {
         (*self).unknown_global_side_effects()
     }
+
+    fn this_may_have_side_effects(&self) -> bool {
+        (*self).this_may_have_side_effects()
+    }
 }
 
 impl<'a> MayHaveSideEffectsContext<'a> for &mut TraverseCtx<'a, MinifierState<'a>> {
@@ -136,6 +177,10 @@ impl<'a> MayHaveSideEffectsContext<'a> for &mut TraverseCtx<'a, MinifierState<'a
 
     fn unknown_global_side_effects(&self) -> bool {
         (**self).unknown_global_side_effects()
+    }
+
+    fn this_may_have_side_effects(&self) -> bool {
+        (**self).this_may_have_side_effects()
     }
 }
 

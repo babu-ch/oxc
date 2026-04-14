@@ -65,8 +65,7 @@ fn test_inline_single_use_variable() {
         }
     ",
     );
-    // Ideally we should merge it to `this.#foo = foo;`
-    test_same(
+    test(
         "
         class Foo {
             #foo;
@@ -76,6 +75,14 @@ fn test_inline_single_use_variable() {
             }
         }
         ",
+        "
+        class Foo {
+            #foo;
+            static {
+                this.#foo = foo;
+            }
+        }
+    ",
     );
     test(
         "

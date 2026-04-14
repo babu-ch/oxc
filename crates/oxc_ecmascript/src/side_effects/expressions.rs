@@ -29,6 +29,7 @@ impl<'a> MayHaveSideEffects<'a> for Expression<'a> {
             | Expression::ArrowFunctionExpression(_)
             | Expression::FunctionExpression(_)
             | Expression::Super(_) => false,
+            Expression::ThisExpression(_) => ctx.this_may_have_side_effects(),
             Expression::TemplateLiteral(e) => e.may_have_side_effects(ctx),
             Expression::UnaryExpression(e) => e.may_have_side_effects(ctx),
             Expression::LogicalExpression(e) => e.may_have_side_effects(ctx),

@@ -474,8 +474,8 @@ fn test_simple_expressions() {
     test("import.meta", false);
     test("(() => {})", false);
 
-    // referencing `this` in a derived class before `super()` is called causes a ReferenceError
-    test("this", true);
+    // module-level `this` is `undefined` and does not cause a ReferenceError
+    test("this", false);
 }
 
 #[test]

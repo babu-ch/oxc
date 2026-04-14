@@ -47,4 +47,13 @@ pub trait MayHaveSideEffectsContext<'a>: GlobalContext<'a> {
     ///
     /// <https://rollupjs.org/configuration-options/#treeshake-unknownglobalsideeffects>
     fn unknown_global_side_effects(&self) -> bool;
+
+    /// Whether the `this` at the current position may have side effects.
+    ///
+    /// In a derived class constructor, accessing `this` before `super()` throws
+    /// a `ReferenceError`. Callers that traverse the AST should return `true`
+    /// when the closest non-arrow function scope is a class constructor.
+    fn this_may_have_side_effects(&self) -> bool {
+        false
+    }
 }

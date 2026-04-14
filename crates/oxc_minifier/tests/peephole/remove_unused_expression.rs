@@ -13,7 +13,7 @@ fn test_remove_unused_expression() {
     test("1", "");
     test("1n", "");
     test(";'s'", "");
-    // test("this", "");
+    test("this", "");
     test("/asdf/", "");
     test("(function () {})", "");
     test("(() => {})", "");
@@ -22,6 +22,33 @@ fn test_remove_unused_expression() {
     test("x", "x");
     test("void 0", "");
     test("void x", "x");
+}
+
+#[test]
+fn test_remove_unused_this() {
+    // `this` inside a constructor is conservatively kept to preserve the
+    // derived-constructor TDZ error (https://github.com/oxc-project/oxc/issues/21296).
+    test_same("export class Foo { constructor() { this; } }");
+    test(
+        "export class Foo extends Bar { constructor() { super(); this; } }",
+        "export class Foo extends Bar { constructor() { super(), this; } }",
+    );
+    test(
+        "export class Foo extends Bar { constructor() { this; super(); } }",
+        "export class Foo extends Bar { constructor() { this, super(); } }",
+    );
+    // The `this` inside an arrow is captured from the enclosing constructor.
+    test(
+        "export class Foo extends Bar { constructor() { (() => { this; })(); super(); } }",
+        "export class Foo extends Bar { constructor() { this, super(); } }",
+    );
+
+    // In all other positions `this` is always initialized and can be dropped.
+    test("{ this; }", "");
+    test("export class Foo { foo() { this; } }", "export class Foo { foo() {} }");
+    test("export class Foo { static foo() { this; } }", "export class Foo { static foo() {} }");
+    test("export class Foo { static { this; } }", "export class Foo {}");
+    test("export function foo() { this; }", "export function foo() {}");
 }
 
 #[test]

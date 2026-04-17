@@ -1426,15 +1426,11 @@ mod test {
             .iter()
             .filter(|(rule, _)| rule.plugin_name() == "eslint")
             .count();
-        let eslint_rules_with = with_override
-            .rules
-            .iter()
-            .filter(|(rule, _)| rule.plugin_name() == "eslint")
-            .count();
+        let eslint_rules_with =
+            with_override.rules.iter().filter(|(rule, _)| rule.plugin_name() == "eslint").count();
 
         assert_eq!(
-            eslint_rules_without,
-            eslint_rules_with,
+            eslint_rules_without, eslint_rules_with,
             "adding import plugin should not change the number of eslint rules"
         );
     }

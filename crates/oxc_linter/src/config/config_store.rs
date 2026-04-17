@@ -208,7 +208,7 @@ impl Config {
                         let rule_plugin = LintPlugins::try_from(rule.plugin_name())
                             .unwrap_or(LintPlugins::empty());
                         // Only apply categories to rules from unconfigured plugins
-                        if unconfigured_plugins.contains(rule_plugin) {
+                        if !rule_plugin.is_empty() && unconfigured_plugins.contains(rule_plugin) {
                             self.categories
                                 .get(&rule.category())
                                 .map(|severity| (rule.clone(), severity))
@@ -1390,6 +1390,56 @@ mod test {
     }
 
     #[test]
+    fn test_override_new_plugin_does_not_reapply_categories_to_eslint_rules() {
+        // ESLINT = 0 (bitflag value 0) causes `unconfigured_plugins.contains(ESLINT)`
+        // to always return true, incorrectly including eslint rules when applying
+        // categories to newly added plugins.
+        let base_config = LintConfig { plugins: LintPlugins::default(), ..LintConfig::default() };
+
+        let mut categories = OxlintCategories::default();
+        categories.insert(RuleCategory::Suspicious, AllowWarnDeny::Warn);
+
+        let base_rules = vec![(
+            RuleEnum::EslintNoUnusedVars(EslintNoUnusedVars::default()),
+            AllowWarnDeny::Warn,
+        )];
+
+        let overrides = ResolvedOxlintOverrides::new(vec![ResolvedOxlintOverride {
+            env: None,
+            files: GlobSet::new(vec!["**/*.ts"]),
+            plugins: Some(LintPlugins::IMPORT),
+            globals: None,
+            rules: ResolvedOxlintOverrideRules { builtin_rules: vec![], external_rules: vec![] },
+        }]);
+
+        let store = ConfigStore::new(
+            Config::new(base_rules, vec![], categories, base_config, overrides),
+            FxHashMap::default(),
+            ExternalPluginStore::default(),
+        );
+
+        let without_override = store.resolve("test.js".as_ref());
+        let with_override = store.resolve("test.ts".as_ref());
+
+        let eslint_rules_without = without_override
+            .rules
+            .iter()
+            .filter(|(rule, _)| rule.plugin_name() == "eslint")
+            .count();
+        let eslint_rules_with = with_override
+            .rules
+            .iter()
+            .filter(|(rule, _)| rule.plugin_name() == "eslint")
+            .count();
+
+        assert_eq!(
+            eslint_rules_without,
+            eslint_rules_with,
+            "adding import plugin should not change the number of eslint rules"
+        );
+    }
+
+    #[test]
     fn test_override_import_plugin_respects_correctness_off() {
         // https://github.com/oxc-project/oxc/issues/21472
         // When correctness is off and an override adds the import plugin,
@@ -1413,10 +1463,8 @@ mod test {
 
         let resolved = config.apply_overrides("testfile.ts".as_ref());
 
-        let no_unused_vars = resolved
-            .rules
-            .iter()
-            .find(|(rule, _)| rule.name() == "no-unused-vars");
+        let no_unused_vars =
+            resolved.rules.iter().find(|(rule, _)| rule.name() == "no-unused-vars");
 
         assert!(
             no_unused_vars.is_none(),

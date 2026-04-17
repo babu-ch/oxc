@@ -1374,4 +1374,53 @@ mod test {
         .build(&mut external_plugin_store)
         .unwrap()
     }
+
+    fn config_from_str_with_defaults(s: &str) -> Config {
+        let mut external_plugin_store = ExternalPluginStore::default();
+        ConfigStoreBuilder::from_oxlintrc(
+            false,
+            serde_json::from_str::<Oxlintrc>(s).unwrap(),
+            None,
+            &mut external_plugin_store,
+            None,
+        )
+        .unwrap()
+        .build(&mut external_plugin_store)
+        .unwrap()
+    }
+
+    #[test]
+    fn test_override_import_plugin_respects_correctness_off() {
+        // https://github.com/oxc-project/oxc/issues/21472
+        // When correctness is off and an override adds the import plugin,
+        // no-unused-vars should not be re-enabled.
+        let config = config_from_str_with_defaults(
+            r#"
+            {
+                "categories": {
+                    "correctness": "off"
+                },
+                "rules": {},
+                "overrides": [
+                    {
+                        "files": ["**/*.ts"],
+                        "plugins": ["import"]
+                    }
+                ]
+            }
+            "#,
+        );
+
+        let resolved = config.apply_overrides("testfile.ts".as_ref());
+
+        let no_unused_vars = resolved
+            .rules
+            .iter()
+            .find(|(rule, _)| rule.name() == "no-unused-vars");
+
+        assert!(
+            no_unused_vars.is_none(),
+            "no-unused-vars should not be re-enabled when correctness is off"
+        );
+    }
 }

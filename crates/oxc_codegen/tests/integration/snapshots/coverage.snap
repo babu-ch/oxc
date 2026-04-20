@@ -176,3 +176,29 @@ const obj = {
 const obj = { /* v8 ignore next */ a: () => 1 }
 ----------
 const obj = { /* v8 ignore next */ a: () => 1 };
+
+########## 27
+const obj = {
+  /* v8 ignore next */
+  a: () => 1,
+  b: () => 2,
+}
+----------
+const obj = {
+	/* v8 ignore next */
+	a: () => 1,
+	b: () => 2
+};
+
+########## 28
+const obj = {
+  a: 1,
+  /* v8 ignore next */
+  ...rest,
+}
+----------
+const obj = {
+	a: 1,
+	/* v8 ignore next */
+	...rest
+};

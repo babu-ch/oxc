@@ -302,6 +302,8 @@ impl Oxc {
             !transform_options.use_define_for_class_fields;
         options.typescript.remove_class_fields_without_initializer =
             !transform_options.use_define_for_class_fields;
+        options.typescript.use_define_for_class_fields =
+            transform_options.use_define_for_class_fields;
         options.decorator.legacy = transform_options.experimental_decorators;
         options.decorator.emit_decorator_metadata = transform_options.emit_decorator_metadata;
         let result =

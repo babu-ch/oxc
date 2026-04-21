@@ -1,5 +1,5 @@
 use oxc_allocator::{TakeIn, Vec as ArenaVec};
-use oxc_ast::ast::*;
+use oxc_ast::{NONE, ast::*};
 use oxc_semantic::{ScopeFlags, ScopeId};
 use oxc_span::SPAN;
 use oxc_str::Ident;
@@ -248,6 +248,55 @@ impl<'a> TypeScript<'a> {
             }
             true
         });
+    }
+
+    /// Add uninitialized class field declarations for constructor parameter properties.
+    ///
+    /// See [`crate::TypeScriptOptions::use_define_for_class_fields`] for semantics and examples.
+    pub(super) fn add_parameter_property_fields(class: &mut Class<'a>, ctx: &TraverseCtx<'a>) {
+        let Some(params) = class.body.body.iter().find_map(|element| {
+            if let ClassElement::MethodDefinition(method) = element
+                && method.kind.is_constructor()
+                && method.value.body.is_some()
+            {
+                Some(&method.value.params.items)
+            } else {
+                None
+            }
+        }) else {
+            return;
+        };
+
+        let source_text = ctx.state.source_text;
+        let fields = ctx.ast.vec_from_iter(
+            params
+                .iter()
+                .filter(|param| param.has_modifier())
+                .filter_map(|param| param.pattern.get_binding_identifier())
+                .map(|id| {
+                    // `id.name` may be renamed by clash detection; use span to recover the original source name.
+                    let prop_name = id.span.source_text(source_text);
+                    let key = ctx.ast.property_key_static_identifier(id.span, prop_name);
+                    ctx.ast.class_element_property_definition(
+                        id.span,
+                        PropertyDefinitionType::PropertyDefinition,
+                        ctx.ast.vec(),
+                        key,
+                        NONE,
+                        None,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        None,
+                    )
+                }),
+        );
+
+        class.body.body.splice(0..0, fields);
     }
 
     /// Transform constructor parameters that include modifier to `this` assignments and

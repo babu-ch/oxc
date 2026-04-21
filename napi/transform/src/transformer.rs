@@ -314,6 +314,17 @@ pub struct TypeScriptOptions {
     ///
     /// Defaults to `false`.
     pub remove_class_fields_without_initializer: Option<bool>,
+    /// When true, emit an uninitialized class field declaration for each constructor
+    /// parameter property, matching TypeScript's output when [`useDefineForClassFields: true`]
+    /// is set. Only takes effect when the class-properties plugin is disabled and
+    /// `setPublicClassFields` is `false`.
+    ///
+    /// Defaults to `false`, matching Babel's `transform-typescript`.
+    ///
+    /// [`useDefineForClassFields: true`]: https://www.typescriptlang.org/tsconfig#useDefineForClassFields
+    ///
+    /// @default false
+    pub use_define_for_class_fields: Option<bool>,
     /// When true, optimize const enums by inlining their values at usage sites
     /// and removing the enum declaration.
     ///
@@ -364,6 +375,9 @@ impl From<TypeScriptOptions> for oxc::transformer::TypeScriptOptions {
             remove_class_fields_without_initializer: options
                 .remove_class_fields_without_initializer
                 .unwrap_or(ops.remove_class_fields_without_initializer),
+            use_define_for_class_fields: options
+                .use_define_for_class_fields
+                .unwrap_or(ops.use_define_for_class_fields),
             rewrite_import_extensions: options.rewrite_import_extensions.and_then(|value| {
                 match value {
                     Either::A(v) => {

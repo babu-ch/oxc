@@ -85,6 +85,34 @@ pub struct TypeScriptOptions {
     #[serde(default)]
     pub remove_class_fields_without_initializer: bool,
 
+    /// When true, emit an uninitialized class field declaration for each constructor
+    /// parameter property, matching TypeScript's output when [`useDefineForClassFields: true`]
+    /// is set. Only takes effect when the class-properties plugin is disabled and
+    /// [`crate::CompilerAssumptions::set_public_class_fields`] is `false`.
+    ///
+    /// Input:
+    /// ```ts
+    /// class C {
+    ///   constructor(public x = 1) {}
+    /// }
+    /// ```
+    ///
+    /// Output:
+    /// ```js
+    /// class C {
+    ///   x;
+    ///   constructor(x = 1) {
+    ///     this.x = x;
+    ///   }
+    /// }
+    /// ```
+    ///
+    /// Defaults to `false`, matching Babel's `transform-typescript`.
+    ///
+    /// [`useDefineForClassFields: true`]: https://www.typescriptlang.org/tsconfig#useDefineForClassFields
+    #[serde(default)]
+    pub use_define_for_class_fields: bool,
+
     /// When true, optimize const enums by inlining their values at usage sites
     /// and removing the enum declaration.
     pub optimize_const_enums: bool,
@@ -117,6 +145,7 @@ impl Default for TypeScriptOptions {
             allow_namespaces: default_as_true(),
             allow_declare_fields: default_as_true(),
             remove_class_fields_without_initializer: false,
+            use_define_for_class_fields: false,
             optimize_const_enums: false,
             optimize_enums: false,
             rewrite_import_extensions: None,

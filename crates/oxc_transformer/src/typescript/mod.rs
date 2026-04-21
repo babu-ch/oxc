@@ -52,6 +52,7 @@ pub struct TypeScript<'a> {
     is_class_properties_plugin_enabled: bool,
     set_public_class_fields: bool,
     remove_class_fields_without_initializer: bool,
+    use_define_for_class_fields: bool,
 }
 
 impl<'a> TypeScript<'a> {
@@ -67,6 +68,7 @@ impl<'a> TypeScript<'a> {
             set_public_class_fields: state.assumptions.set_public_class_fields,
             remove_class_fields_without_initializer: !options.allow_declare_fields
                 || options.remove_class_fields_without_initializer,
+            use_define_for_class_fields: options.use_define_for_class_fields,
         }
     }
 }
@@ -120,8 +122,12 @@ impl<'a> Traverse<'a, TransformState<'a>> for TypeScript<'a> {
 
         // Avoid converting class fields when class-properties plugin is enabled, that plugin has covered all
         // this transformation does.
-        if !self.is_class_properties_plugin_enabled && self.set_public_class_fields {
-            self.transform_class_fields(class, ctx);
+        if !self.is_class_properties_plugin_enabled {
+            if self.set_public_class_fields {
+                self.transform_class_fields(class, ctx);
+            } else if self.use_define_for_class_fields {
+                Self::add_parameter_property_fields(class, ctx);
+            }
         }
     }
 

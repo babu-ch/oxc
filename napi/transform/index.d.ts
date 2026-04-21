@@ -617,6 +617,19 @@ export interface TypeScriptOptions {
    */
   removeClassFieldsWithoutInitializer?: boolean
   /**
+   * When true, emit an uninitialized class field declaration for each constructor
+   * parameter property, matching TypeScript's output when [`useDefineForClassFields: true`]
+   * is set. Only takes effect when the class-properties plugin is disabled and
+   * `setPublicClassFields` is `false`.
+   *
+   * Defaults to `false`, matching Babel's `transform-typescript`.
+   *
+   * [`useDefineForClassFields: true`]: https://www.typescriptlang.org/tsconfig#useDefineForClassFields
+   *
+   * @default false
+   */
+  useDefineForClassFields?: boolean
+  /**
    * When true, optimize const enums by inlining their values at usage sites
    * and removing the enum declaration.
    *

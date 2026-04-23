@@ -2,7 +2,8 @@ use fast_glob::glob_match;
 
 use oxc_diagnostics::OxcDiagnostic;
 use oxc_macros::declare_oxc_lint;
-use oxc_span::{CompactStr, Span};
+use oxc_span::Span;
+use oxc_str::CompactStr;
 use schemars::JsonSchema;
 use serde::Deserialize;
 
@@ -79,6 +80,7 @@ declare_oxc_lint!(
     style,
     pending,  // TODO: fixer
     config = NoNamespaceConfig,
+    version = "0.12.0",
 );
 
 /// <https://github.com/import-js/eslint-plugin-import/blob/v2.29.1/docs/rules/no-namespace.md>

@@ -737,6 +737,7 @@ pub use crate::rules::vue::no_import_compiler_macros::NoImportCompilerMacros as 
 pub use crate::rules::vue::no_lifecycle_after_await::NoLifecycleAfterAwait as VueNoLifecycleAfterAwait;
 pub use crate::rules::vue::no_multiple_slot_args::NoMultipleSlotArgs as VueNoMultipleSlotArgs;
 pub use crate::rules::vue::no_required_prop_with_default::NoRequiredPropWithDefault as VueNoRequiredPropWithDefault;
+pub use crate::rules::vue::no_reserved_keys::NoReservedKeys as VueNoReservedKeys;
 pub use crate::rules::vue::no_this_in_before_route_enter::NoThisInBeforeRouteEnter as VueNoThisInBeforeRouteEnter;
 pub use crate::rules::vue::prefer_import_from_vue::PreferImportFromVue as VuePreferImportFromVue;
 pub use crate::rules::vue::require_default_export::RequireDefaultExport as VueRequireDefaultExport;
@@ -1485,6 +1486,7 @@ pub enum RuleEnum {
     VueNoLifecycleAfterAwait(VueNoLifecycleAfterAwait),
     VueNoMultipleSlotArgs(VueNoMultipleSlotArgs),
     VueNoRequiredPropWithDefault(VueNoRequiredPropWithDefault),
+    VueNoReservedKeys(VueNoReservedKeys),
     VueNoThisInBeforeRouteEnter(VueNoThisInBeforeRouteEnter),
     VuePreferImportFromVue(VuePreferImportFromVue),
     VueRequireDefaultExport(VueRequireDefaultExport),
@@ -2312,7 +2314,8 @@ const VUE_NO_IMPORT_COMPILER_MACROS_ID: usize = VUE_NO_EXPORT_IN_SCRIPT_SETUP_ID
 const VUE_NO_LIFECYCLE_AFTER_AWAIT_ID: usize = VUE_NO_IMPORT_COMPILER_MACROS_ID + 1usize;
 const VUE_NO_MULTIPLE_SLOT_ARGS_ID: usize = VUE_NO_LIFECYCLE_AFTER_AWAIT_ID + 1usize;
 const VUE_NO_REQUIRED_PROP_WITH_DEFAULT_ID: usize = VUE_NO_MULTIPLE_SLOT_ARGS_ID + 1usize;
-const VUE_NO_THIS_IN_BEFORE_ROUTE_ENTER_ID: usize = VUE_NO_REQUIRED_PROP_WITH_DEFAULT_ID + 1usize;
+const VUE_NO_RESERVED_KEYS_ID: usize = VUE_NO_REQUIRED_PROP_WITH_DEFAULT_ID + 1usize;
+const VUE_NO_THIS_IN_BEFORE_ROUTE_ENTER_ID: usize = VUE_NO_RESERVED_KEYS_ID + 1usize;
 const VUE_PREFER_IMPORT_FROM_VUE_ID: usize = VUE_NO_THIS_IN_BEFORE_ROUTE_ENTER_ID + 1usize;
 const VUE_REQUIRE_DEFAULT_EXPORT_ID: usize = VUE_PREFER_IMPORT_FROM_VUE_ID + 1usize;
 const VUE_REQUIRE_TYPED_REF_ID: usize = VUE_REQUIRE_DEFAULT_EXPORT_ID + 1usize;
@@ -3164,6 +3167,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(_) => VUE_NO_LIFECYCLE_AFTER_AWAIT_ID,
             Self::VueNoMultipleSlotArgs(_) => VUE_NO_MULTIPLE_SLOT_ARGS_ID,
             Self::VueNoRequiredPropWithDefault(_) => VUE_NO_REQUIRED_PROP_WITH_DEFAULT_ID,
+            Self::VueNoReservedKeys(_) => VUE_NO_RESERVED_KEYS_ID,
             Self::VueNoThisInBeforeRouteEnter(_) => VUE_NO_THIS_IN_BEFORE_ROUTE_ENTER_ID,
             Self::VuePreferImportFromVue(_) => VUE_PREFER_IMPORT_FROM_VUE_ID,
             Self::VueRequireDefaultExport(_) => VUE_REQUIRE_DEFAULT_EXPORT_ID,
@@ -4003,6 +4007,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(_) => VueNoLifecycleAfterAwait::NAME,
             Self::VueNoMultipleSlotArgs(_) => VueNoMultipleSlotArgs::NAME,
             Self::VueNoRequiredPropWithDefault(_) => VueNoRequiredPropWithDefault::NAME,
+            Self::VueNoReservedKeys(_) => VueNoReservedKeys::NAME,
             Self::VueNoThisInBeforeRouteEnter(_) => VueNoThisInBeforeRouteEnter::NAME,
             Self::VuePreferImportFromVue(_) => VuePreferImportFromVue::NAME,
             Self::VueRequireDefaultExport(_) => VueRequireDefaultExport::NAME,
@@ -4896,6 +4901,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(_) => VueNoLifecycleAfterAwait::CATEGORY,
             Self::VueNoMultipleSlotArgs(_) => VueNoMultipleSlotArgs::CATEGORY,
             Self::VueNoRequiredPropWithDefault(_) => VueNoRequiredPropWithDefault::CATEGORY,
+            Self::VueNoReservedKeys(_) => VueNoReservedKeys::CATEGORY,
             Self::VueNoThisInBeforeRouteEnter(_) => VueNoThisInBeforeRouteEnter::CATEGORY,
             Self::VuePreferImportFromVue(_) => VuePreferImportFromVue::CATEGORY,
             Self::VueRequireDefaultExport(_) => VueRequireDefaultExport::CATEGORY,
@@ -5736,6 +5742,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(_) => VueNoLifecycleAfterAwait::FIX,
             Self::VueNoMultipleSlotArgs(_) => VueNoMultipleSlotArgs::FIX,
             Self::VueNoRequiredPropWithDefault(_) => VueNoRequiredPropWithDefault::FIX,
+            Self::VueNoReservedKeys(_) => VueNoReservedKeys::FIX,
             Self::VueNoThisInBeforeRouteEnter(_) => VueNoThisInBeforeRouteEnter::FIX,
             Self::VuePreferImportFromVue(_) => VuePreferImportFromVue::FIX,
             Self::VueRequireDefaultExport(_) => VueRequireDefaultExport::FIX,
@@ -6796,6 +6803,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(_) => VueNoLifecycleAfterAwait::documentation(),
             Self::VueNoMultipleSlotArgs(_) => VueNoMultipleSlotArgs::documentation(),
             Self::VueNoRequiredPropWithDefault(_) => VueNoRequiredPropWithDefault::documentation(),
+            Self::VueNoReservedKeys(_) => VueNoReservedKeys::documentation(),
             Self::VueNoThisInBeforeRouteEnter(_) => VueNoThisInBeforeRouteEnter::documentation(),
             Self::VuePreferImportFromVue(_) => VuePreferImportFromVue::documentation(),
             Self::VueRequireDefaultExport(_) => VueRequireDefaultExport::documentation(),
@@ -8891,6 +8899,8 @@ impl RuleEnum {
                 VueNoRequiredPropWithDefault::config_schema(generator)
                     .or_else(|| VueNoRequiredPropWithDefault::schema(generator))
             }
+            Self::VueNoReservedKeys(_) => VueNoReservedKeys::config_schema(generator)
+                .or_else(|| VueNoReservedKeys::schema(generator)),
             Self::VueNoThisInBeforeRouteEnter(_) => {
                 VueNoThisInBeforeRouteEnter::config_schema(generator)
                     .or_else(|| VueNoThisInBeforeRouteEnter::schema(generator))
@@ -9638,6 +9648,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(_) => "vue",
             Self::VueNoMultipleSlotArgs(_) => "vue",
             Self::VueNoRequiredPropWithDefault(_) => "vue",
+            Self::VueNoReservedKeys(_) => "vue",
             Self::VueNoThisInBeforeRouteEnter(_) => "vue",
             Self::VuePreferImportFromVue(_) => "vue",
             Self::VueRequireDefaultExport(_) => "vue",
@@ -11996,6 +12007,9 @@ impl RuleEnum {
             Self::VueNoRequiredPropWithDefault(_) => Ok(Self::VueNoRequiredPropWithDefault(
                 VueNoRequiredPropWithDefault::from_configuration(value)?,
             )),
+            Self::VueNoReservedKeys(_) => {
+                Ok(Self::VueNoReservedKeys(VueNoReservedKeys::from_configuration(value)?))
+            }
             Self::VueNoThisInBeforeRouteEnter(_) => Ok(Self::VueNoThisInBeforeRouteEnter(
                 VueNoThisInBeforeRouteEnter::from_configuration(value)?,
             )),
@@ -12751,6 +12765,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(rule) => rule.to_configuration(),
             Self::VueNoMultipleSlotArgs(rule) => rule.to_configuration(),
             Self::VueNoRequiredPropWithDefault(rule) => rule.to_configuration(),
+            Self::VueNoReservedKeys(rule) => rule.to_configuration(),
             Self::VueNoThisInBeforeRouteEnter(rule) => rule.to_configuration(),
             Self::VuePreferImportFromVue(rule) => rule.to_configuration(),
             Self::VueRequireDefaultExport(rule) => rule.to_configuration(),
@@ -13490,6 +13505,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(rule) => rule.run(node, ctx),
             Self::VueNoMultipleSlotArgs(rule) => rule.run(node, ctx),
             Self::VueNoRequiredPropWithDefault(rule) => rule.run(node, ctx),
+            Self::VueNoReservedKeys(rule) => rule.run(node, ctx),
             Self::VueNoThisInBeforeRouteEnter(rule) => rule.run(node, ctx),
             Self::VuePreferImportFromVue(rule) => rule.run(node, ctx),
             Self::VueRequireDefaultExport(rule) => rule.run(node, ctx),
@@ -14229,6 +14245,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(rule) => rule.run_once(ctx),
             Self::VueNoMultipleSlotArgs(rule) => rule.run_once(ctx),
             Self::VueNoRequiredPropWithDefault(rule) => rule.run_once(ctx),
+            Self::VueNoReservedKeys(rule) => rule.run_once(ctx),
             Self::VueNoThisInBeforeRouteEnter(rule) => rule.run_once(ctx),
             Self::VuePreferImportFromVue(rule) => rule.run_once(ctx),
             Self::VueRequireDefaultExport(rule) => rule.run_once(ctx),
@@ -15072,6 +15089,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(rule) => rule.run_on_jest_node(jest_node, ctx),
             Self::VueNoMultipleSlotArgs(rule) => rule.run_on_jest_node(jest_node, ctx),
             Self::VueNoRequiredPropWithDefault(rule) => rule.run_on_jest_node(jest_node, ctx),
+            Self::VueNoReservedKeys(rule) => rule.run_on_jest_node(jest_node, ctx),
             Self::VueNoThisInBeforeRouteEnter(rule) => rule.run_on_jest_node(jest_node, ctx),
             Self::VuePreferImportFromVue(rule) => rule.run_on_jest_node(jest_node, ctx),
             Self::VueRequireDefaultExport(rule) => rule.run_on_jest_node(jest_node, ctx),
@@ -15811,6 +15829,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(rule) => rule.should_run(ctx),
             Self::VueNoMultipleSlotArgs(rule) => rule.should_run(ctx),
             Self::VueNoRequiredPropWithDefault(rule) => rule.should_run(ctx),
+            Self::VueNoReservedKeys(rule) => rule.should_run(ctx),
             Self::VueNoThisInBeforeRouteEnter(rule) => rule.should_run(ctx),
             Self::VuePreferImportFromVue(rule) => rule.should_run(ctx),
             Self::VueRequireDefaultExport(rule) => rule.should_run(ctx),
@@ -16870,6 +16889,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(_) => VueNoLifecycleAfterAwait::IS_TSGOLINT_RULE,
             Self::VueNoMultipleSlotArgs(_) => VueNoMultipleSlotArgs::IS_TSGOLINT_RULE,
             Self::VueNoRequiredPropWithDefault(_) => VueNoRequiredPropWithDefault::IS_TSGOLINT_RULE,
+            Self::VueNoReservedKeys(_) => VueNoReservedKeys::IS_TSGOLINT_RULE,
             Self::VueNoThisInBeforeRouteEnter(_) => VueNoThisInBeforeRouteEnter::IS_TSGOLINT_RULE,
             Self::VuePreferImportFromVue(_) => VuePreferImportFromVue::IS_TSGOLINT_RULE,
             Self::VueRequireDefaultExport(_) => VueRequireDefaultExport::IS_TSGOLINT_RULE,
@@ -17765,6 +17785,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(_) => VueNoLifecycleAfterAwait::VERSION,
             Self::VueNoMultipleSlotArgs(_) => VueNoMultipleSlotArgs::VERSION,
             Self::VueNoRequiredPropWithDefault(_) => VueNoRequiredPropWithDefault::VERSION,
+            Self::VueNoReservedKeys(_) => VueNoReservedKeys::VERSION,
             Self::VueNoThisInBeforeRouteEnter(_) => VueNoThisInBeforeRouteEnter::VERSION,
             Self::VuePreferImportFromVue(_) => VuePreferImportFromVue::VERSION,
             Self::VueRequireDefaultExport(_) => VueRequireDefaultExport::VERSION,
@@ -18687,6 +18708,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(_) => VueNoLifecycleAfterAwait::HAS_CONFIG,
             Self::VueNoMultipleSlotArgs(_) => VueNoMultipleSlotArgs::HAS_CONFIG,
             Self::VueNoRequiredPropWithDefault(_) => VueNoRequiredPropWithDefault::HAS_CONFIG,
+            Self::VueNoReservedKeys(_) => VueNoReservedKeys::HAS_CONFIG,
             Self::VueNoThisInBeforeRouteEnter(_) => VueNoThisInBeforeRouteEnter::HAS_CONFIG,
             Self::VuePreferImportFromVue(_) => VuePreferImportFromVue::HAS_CONFIG,
             Self::VueRequireDefaultExport(_) => VueRequireDefaultExport::HAS_CONFIG,
@@ -19426,6 +19448,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(rule) => rule.types_info(),
             Self::VueNoMultipleSlotArgs(rule) => rule.types_info(),
             Self::VueNoRequiredPropWithDefault(rule) => rule.types_info(),
+            Self::VueNoReservedKeys(rule) => rule.types_info(),
             Self::VueNoThisInBeforeRouteEnter(rule) => rule.types_info(),
             Self::VuePreferImportFromVue(rule) => rule.types_info(),
             Self::VueRequireDefaultExport(rule) => rule.types_info(),
@@ -20165,6 +20188,7 @@ impl RuleEnum {
             Self::VueNoLifecycleAfterAwait(rule) => rule.run_info(),
             Self::VueNoMultipleSlotArgs(rule) => rule.run_info(),
             Self::VueNoRequiredPropWithDefault(rule) => rule.run_info(),
+            Self::VueNoReservedKeys(rule) => rule.run_info(),
             Self::VueNoThisInBeforeRouteEnter(rule) => rule.run_info(),
             Self::VuePreferImportFromVue(rule) => rule.run_info(),
             Self::VueRequireDefaultExport(rule) => rule.run_info(),
@@ -21026,6 +21050,7 @@ pub static RULES: std::sync::LazyLock<Vec<RuleEnum>> = std::sync::LazyLock::new(
         RuleEnum::VueNoLifecycleAfterAwait(VueNoLifecycleAfterAwait::default()),
         RuleEnum::VueNoMultipleSlotArgs(VueNoMultipleSlotArgs::default()),
         RuleEnum::VueNoRequiredPropWithDefault(VueNoRequiredPropWithDefault::default()),
+        RuleEnum::VueNoReservedKeys(VueNoReservedKeys::default()),
         RuleEnum::VueNoThisInBeforeRouteEnter(VueNoThisInBeforeRouteEnter::default()),
         RuleEnum::VuePreferImportFromVue(VuePreferImportFromVue::default()),
         RuleEnum::VueRequireDefaultExport(VueRequireDefaultExport::default()),
